@@ -1,0 +1,622 @@
+/* -------------------
+   Global Styles
+------------------- */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #f7f9f7;
+  color: #333;
+  margin: 0;
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+/* Brand */
+.text-brand { color: #263e10; }
+.bg-brand { background-color: #263e10; }
+
+/* -------------------
+   Header image
+------------------- */
+header img {
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  padding-top: 1rem;   /* extra space above */
+  padding-bottom: 1rem; /* extra space below */
+}
+
+/* -------------------
+   Layout
+------------------- */
+.form-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  text-align: center;
+  color: #263e10;
+  margin-top: 2rem;   /* space above */
+  margin-bottom: 0.75rem; /* tighter below */
+}
+
+.section-title {
+  font-size: 1.25rem;
+  font-weight: 800;
+  color: #263e10;
+  margin-bottom: 1.25rem;
+  text-align: center;
+}
+
+.form-section {
+  background: #fff;
+  padding: 1rem 2rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+  margin-bottom: 1rem;
+}
+
+/* Tab section spacing */
+.tab-section {
+  margin-top: 1rem;
+}
+
+/* -------------------
+   Form Groups (labels left, centered alignment)
+------------------- */
+.form-group {
+  display: flex;
+  align-items: center; /* vertically center label + input */
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.form-group label {
+  flex: 0 0 200px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  color: #444;
+  text-align: right;
+  padding-top: 0; /* remove forced top alignment */
+}
+
+.form-group input,
+.form-group select,
+.form-group textarea {
+  flex: 1;
+  width: 100%;
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1rem;
+  font-size: 1rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+
+.form-group textarea {
+  min-height: 120px;
+}
+
+.form-group input:focus,
+.form-group select:focus,
+.form-group textarea:focus {
+  outline: none;
+  border-color: #263e10;
+  box-shadow: 0 0 0 2px rgba(38, 62, 16, 0.1);
+}
+
+/* Responsive: stack labels above on mobile */
+@media (max-width: 768px) {
+  .form-group {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .form-group label {
+    flex: none;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 0.4rem;
+  }
+}
+
+/* -------------------
+   Flex Utility Gaps
+------------------- */
+.flex {
+  display: flex;
+}
+
+.gap-2 { gap: 0.5rem; }
+.gap-3 { gap: 0.75rem; }
+.gap-4 { gap: 1rem; }  /* used for Edit/Delete buttons */
+
+/* -------------------
+   Completion Badge
+------------------- */
+.completion-badge {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-align: center;
+  min-width: 140px;
+}
+
+.completion-red {
+  background-color: #dc2626; /* Tailwind red-600 */
+  color: #fff;
+}
+
+.completion-yellow {
+  background-color: #facc15; /* Tailwind yellow-400 */
+  color: #000;
+}
+
+.completion-green {
+  background-color: #16a34a; /* Tailwind green-600 */
+  color: #fff;
+}
+
+/* -------------------
+   Address container (2-column layout for solicitor addresses)
+------------------- */
+.address-container {
+  background: #fafafa;
+  border: 1px solid #ddd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  margin-top: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.form-group input,
+.form-group select {
+  width: 100%; /* ✅ make all form inputs full width */
+}
+
+/* -------------------
+   Special Rows
+------------------- */
+
+/* Postcode input + lookup button */
+.postcode-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+}
+.postcode-row input {
+  flex: 1;
+}
+
+/* Address titles */
+.address-title {
+  text-align: center;
+  font-weight: 600;
+  margin-bottom: 0.75rem;
+  color: #263e10;
+}
+
+/* -------------------
+   Yes/No toggle split field
+------------------- */
+.yesno-group {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+  margin-bottom: 0.5rem;
+}
+
+.yesno-label {
+  flex: 0 0 260px;
+  font-weight: 500;
+  font-size: 1rem;
+  color: #444;
+  text-align: right;
+}
+
+.yesno-toggle {
+  flex: 1;
+  display: flex;
+  gap: 0.75rem;
+}
+
+.yesno-toggle button {
+  flex: 1;
+  padding: 0.6rem 1rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  background: #f7f9f7;
+  color: #333;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.yesno-toggle button:hover {
+  background: #e2e2e2;
+}
+
+.yesno-toggle button.active {
+  background: #263e10;
+  border-color: #263e10;
+  color: #fff;
+}
+
+/* -------------------
+   Buttons
+------------------- */
+.btn {
+  font-weight: 500;
+  border-radius: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  font-size: 1rem;
+}
+
+.btn-primary {
+  background-color: #263e10;
+  color: #fff;
+  border: none;
+}
+.btn-primary:hover { background-color: #36581a; }
+
+.btn-secondary {
+  background-color: #f2f2f2;
+  color: #333;
+  border: none;
+}
+.btn-secondary:hover { background-color: #e2e2e2; }
+
+/* -------------------
+   Tables (Shareholding, etc.)
+------------------- */
+.styled-table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.styled-table th,
+.styled-table td {
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.styled-table th {
+  background: #f0f2f0;
+  font-weight: 600;
+}
+
+/* Row striping */
+.styled-table tr:nth-child(even) {
+  background: #fafafa;
+}
+
+/* Column widths (Shareholding: 50/30/20) */
+.styled-table th:nth-child(1),
+.styled-table td:nth-child(1) { width: 60%; }
+.styled-table th:nth-child(2),
+.styled-table td:nth-child(2) { width: 25%; text-align: center; }
+.styled-table th:nth-child(3),
+.styled-table td:nth-child(3) { width: 15%; text-align: center; padding: 0; }
+
+/* Inputs inside table cells */
+.styled-table input {
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  border: none;
+  outline: none;
+  font-size: 0.95rem;
+  background: transparent;
+  box-sizing: border-box;
+}
+
+/* Actions cell */
+.actions-cell {
+  text-align: center;
+  padding: 0;
+  height: 40px;
+}
+
+.action-btn {
+  width: 35%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  transition: background 0.2s ease;
+}
+
+/* Hover covers the full actions cell without changing button size */
+.actions-cell:hover {
+  background: #f0f0f0;
+}
+
+.action-btn.save { color: #263e10; }
+.action-btn.cancel { color: #999; }
+.action-btn.edit { color: #333; }
+.action-btn.delete { color: #b00020; }
+
+/* +Add row button inside table */
+.styled-table .add-btn {
+  width: 100%;
+  border: none;
+  background: none;
+  color: #263e10;
+  font-weight: 800;
+  cursor: pointer;
+  padding: 0.5rem;
+  transition: background 0.2s ease, font-weight 0.2s ease;
+}
+.styled-table .add-btn:hover {
+  background: #e9ece9;
+  font-weight: 800;
+}
+
+/* -------------------
+   Cards
+------------------- */
+.form-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+  display: grid;
+  grid-template-columns: 1fr auto 1fr; /* left - center - right */
+  justify-content: space-between;
+  align-items: center;
+}
+
+.form-card .actions {
+  display: flex;
+  justify-content: flex-end; /* push buttons to the right */
+  gap: 1rem;                 /* spacing between buttons */
+}
+
+/* -------------------
+   Consent grid
+------------------- */
+.consent-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+}
+
+.consent-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 0.75rem;
+  padding: 1rem;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.signature-box {
+  border: 2px dashed #ccc;
+  border-radius: 0.5rem;
+  height: 120px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.signature-box:hover { border-color: #263e10; }
+
+.signature-wrapper {
+  border: 2px dotted #666;   /* dotted border */
+  border-radius: 0.5rem;
+  padding: 0.5rem;
+  margin-bottom: 25px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: #fff;
+}
+
+/* ConsentPage bottom action buttons */
+.consent-actions {
+  display: flex;
+  justify-content: center; /* center horizontally */
+  gap: 1rem;               /* space between buttons */
+  margin-top: 2rem;        /* gap above buttons */
+}
+
+.consent-actions .btn {
+  flex: 1;
+  max-width: 200px;        /* keeps equal width */
+  text-align: center;
+}
+
+.consent-options-column {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  margin: 1rem 0;
+  align-items: center; /* center the whole block */
+}
+
+.consent-options-column label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 300px;          /* fixed width so all align */
+  text-align: left;      /* text stays left */
+}
+
+/* -------------------
+   Dialog Overlay
+------------------- */
+.dialog-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+.dialog-content {
+  background: #fff;
+  border-radius: 0.75rem;
+  padding: 2rem;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.25);
+  animation: fadeIn 0.2s ease-out;
+}
+
+.dialog-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #263e10;
+}
+
+.dialog-text {
+  font-size: 1rem;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  text-align: center;
+  color: #263e10;
+}
+
+.dialog-actions {
+  display: flex;
+  justify-content: center; /* center buttons */
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.dialog-actions .btn {
+  flex: 1;              /* make them equal width */
+  max-width: 180px;     /* optional cap so they don’t stretch too wide */
+  text-align: center;   /* center text inside */
+}
+
+/* -------------------
+   Dropdown (react-select override)
+------------------- */
+.dropdown {
+  flex: 1;
+  font-size: 0.95rem;
+}
+
+.dropdown .rs__control {
+  border: 1px solid #ccc;
+  border-radius: 0.5rem;
+  min-height: 2.75rem;
+  box-shadow: none;
+}
+
+.dropdown .rs__control--is-focused {
+  border-color: #263e10;
+  box-shadow: 0 0 0 2px rgba(38, 62, 16, 0.1);
+}
+
+.dropdown .rs__multi-value {
+  background: #e6efe1;
+  border-radius: 0.3rem;
+  padding: 0 4px;
+}
+
+.dropdown .rs__multi-value__label {
+  color: #263e10;
+  font-weight: 500;
+  font-size: 0.85rem;
+}
+
+.dropdown .rs__multi-value__remove {
+  color: #263e10;
+  cursor: pointer;
+}
+
+.dropdown .rs__option {
+  font-size: 0.9rem;
+  padding: 8px 12px;
+}
+
+.dropdown .rs__option--is-focused {
+  background: #f0f6ec;
+}
+
+.dropdown .rs__option--is-selected {
+  background: #263e10;
+  color: white;
+}
+
+/* -------------------
+   Tick Boxes
+------------------- */
+.consent-options label {
+  display: flex;
+  align-items: center;
+  padding-left: 165px;
+  gap: 0.5rem;
+  margin-bottom: 1rem; /* consistent spacing */
+}
+
+
+/* -------------------
+   Animations
+------------------- */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* -------------------
+   Special fields
+------------------- */
+.incorporated-field {
+  font-family: 'Courier New', monospace;
+  font-size: 0.95rem;
+  letter-spacing: 0.5px;
+}
+
+/* -------------------
+   Loading overlay
+------------------- */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+}
+
+.spinner {
+  width: 60px;
+  height: 60px;
+  border: 6px solid #fff;
+  border-top-color: #263e10; /* brand color */
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
