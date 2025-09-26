@@ -138,7 +138,7 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
     // Example now: /Shared Documents/opportunity/12345 Test
 
     // 🔹 Strip "Shared Documents/opportunity/" so only folder remains
-    driveFolderPath = driveFolderPath.replace(/^\/Shared Documents\/opportunity\//, "/");
+    driveFolderPath = driveFolderPath.replace(/^\/opportunity\//, "/");
 
     // Ensure clean leading slash
     if (!driveFolderPath.startsWith("/")) {
