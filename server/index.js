@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
 });
 
 // ✅ Mount routes
-app.use("/api/convert-pdf", convertRoutes);
+app.use("/api/download-pdf", convertRoutes);
 app.use("/api/applications", applicationsRoutes);
 app.use("/api/lookup-address", lookupAddressRoutes);
 
@@ -54,7 +54,7 @@ app.use("/api/crm", updateOpportunitySecuritiesRoutes);
 app.use("/api/crm", updateOpportunityCompanyRoutes);
 app.use("/api/crm", updateOpportunitySolicitorRoutes);
 app.use("/api/crm", updateOpportunityDetailsRoutes);
-app.use("/api/crm", saveAppFormPDFRoutes);
+app.use("/api/save-pdf", saveAppFormPDFRoutes);
 
 // Start server
 const PORT = process.env.PORT || 5000;
