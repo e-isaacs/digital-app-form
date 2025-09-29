@@ -1,0 +1,28 @@
+# Ignore client build (handled by Vercel)
+client/
+
+# Ignore local node_modules
+node_modules/
+*/node_modules/
+
+# Ignore logs and debug files
+npm-debug.log
+yarn-error.log
+*.log
+
+# Ignore environment and secrets
+.env
+*.env
+
+# Ignore git metadata
+.git
+.gitignore
+
+# Ignore Dockerfile artifacts
+Dockerfile*
+.dockerignore
+
+# Ignore OS / editor files
+.DS_Store
+Thumbs.db
+*.swp

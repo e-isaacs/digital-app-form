@@ -186,22 +186,17 @@ export default function ConsentPage() {
 
       // 7️⃣ Generate DOCX with same dataset as Print + upload for conversion/storage
       const zip = new PizZip(await (await fetch("/templates/application_form.docx")).arrayBuffer());
-
       const imageModule = new ImageModule({
         getImage: (tagValue) => {
           if (!tagValue) return null;
-          const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
+          const base64Data = tagValue.replace(/^data:image\/png;base64,/, "");
           const binary = atob(base64Data);
           const len = binary.length;
           const bytes = new Uint8Array(len);
           for (let i = 0; i < len; i++) {
             bytes[i] = binary.charCodeAt(i);
           }
-          // ✅ return Buffer in Node.js, ArrayBuffer in browser
-          if (typeof Buffer !== "undefined") {
-            return Buffer.from(bytes);
-          }
-          return bytes.buffer;
+          return bytes;
         },
         getSize: () => [200, 80],
       });
@@ -361,23 +356,31 @@ export default function ConsentPage() {
       const imageOpts = {
         getImage: function (tagValue) {
           if (!tagValue) return null;
-          const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
-          const binary = atob(base64Data);
+          const base64Data = tagValue.replace(/^data:image\/png;base64,/, "");
+          const binary = atob(base64Data); // decode base64
           const len = binary.length;
           const bytes = new Uint8Array(len);
           for (let i = 0; i < len; i++) {
             bytes[i] = binary.charCodeAt(i);
           }
-          // ✅ return Buffer in Node.js, ArrayBuffer in browser
-          if (typeof Buffer !== "undefined") {
-            return Buffer.from(bytes);
-          }
-          return bytes.buffer;
+          return bytes;
         },
         getSize: function () {
-          return [200, 80];
+          // must return a 2-element array [width, height]
+          return [200, 80]; // width & height in pixels
         },
       };
+
+      // Convert ArrayBuffer → base64 (browser-safe)
+      function arrayBufferToBase64(buffer) {
+        let binary = '';
+        const bytes = new Uint8Array(buffer);
+        const len = bytes.byteLength;
+        for (let i = 0; i < len; i++) {
+          binary += String.fromCharCode(bytes[i]);
+        }
+        return window.btoa(binary);
+      }
 
       const imageModule = new ImageModule(imageOpts);
 
