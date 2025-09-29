@@ -1,5 +1,7 @@
 # Ignore client build (handled by Vercel)
-client/
+client/*
+!client/src/utils/countries.js
+!client/src/utils/nationalities.js
 
 # Ignore local node_modules
 node_modules/
