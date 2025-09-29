@@ -18,6 +18,7 @@ router.post("/update-opportunity-company/:id", async (req, res) => {
       const oppUrl = `${instanceUrl}/api/data/v9.0/opportunities(${id})`;
       const oppPayload = {
         "parentaccountid@odata.bind": null,
+        inh_isacompany: false,
         inh_companyname: "",
         inh_registrationnumber: ""
       };
