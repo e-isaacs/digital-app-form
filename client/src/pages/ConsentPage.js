@@ -583,6 +583,8 @@ export default function ConsentPage() {
       });
 
       if (!pdfResponse.ok) {
+        const errText = await pdfResponse.text();
+        console.error("PDF backend error:", errText);
         throw new Error("PDF conversion failed");
       }
 
