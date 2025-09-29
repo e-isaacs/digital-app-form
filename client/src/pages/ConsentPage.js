@@ -190,15 +190,18 @@ export default function ConsentPage() {
       const imageModule = new ImageModule({
         getImage: (tagValue) => {
           if (!tagValue) return null;
+          // strip the base64 prefix
           const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          const binary = atob(base64Data);
+          const len = binary.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
           }
-          return new Uint8Array(byteNumbers);
+          // ✅ return ArrayBuffer for image module
+          return bytes.buffer;
         },
-        getSize: () => [200, 80], // adjust signature size
+        getSize: () => [200, 80], // adjust signature image size
       });
 
       const doc = new Docxtemplater(zip, { modules: [imageModule] });
