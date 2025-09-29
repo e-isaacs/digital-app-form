@@ -29,8 +29,6 @@ async function getGraphAccessToken() {
   return json.access_token;
 }
 
-// 🔴 OLD: router.post("/", …)
-// 🟢 NEW: keep endpoint the same → /convert-pdf
 router.post("/", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
@@ -39,11 +37,11 @@ router.post("/", upload.single("file"), async (req, res) => {
   try {
     const siteIdParts = process.env.SHAREPOINT_SITE_ID.split(",");
     const graphSiteId = siteIdParts[1];
-    const driveId = process.env.SHAREPOINT_DRIVE_ID;
+    const driveId = process.env.SHAREPOINT_DRIVE_ID; // 👈 must match where you want it
     const graphToken = await getGraphAccessToken();
     const fileName = "Temp_Form.docx";
 
-    // 1️⃣ Upload DOCX to Graph
+    // Upload DOCX to Graph
     const uploadUrl = `https://graph.microsoft.com/v1.0/sites/${graphSiteId}/drives/${driveId}/root:/${fileName}:/content`;
     const fileBuffer = await fs.promises.readFile(req.file.path);
 
@@ -53,27 +51,35 @@ router.post("/", upload.single("file"), async (req, res) => {
       headers: { Authorization: `Bearer ${graphToken}` },
       body: fileBuffer,
     });
-    if (!uploadRes.ok) throw new Error(await uploadRes.text());
+    if (!uploadRes.ok) {
+      const errText = await uploadRes.text();
+      throw new Error(`Upload failed: ${errText}`);
+    }
     const uploaded = await uploadRes.json();
     console.log("✅ DOCX uploaded:", uploaded.id);
 
-    // 2️⃣ Convert to PDF via Graph
+    // Convert to PDF
     const itemId = uploaded.id;
     const pdfUrl = `https://graph.microsoft.com/v1.0/sites/${graphSiteId}/drives/${driveId}/items/${itemId}/content?format=pdf`;
 
     console.log("🔄 Requesting PDF conversion from Graph...");
     const pdfRes = await fetch(pdfUrl, { headers: { Authorization: `Bearer ${graphToken}` } });
-    if (!pdfRes.ok) throw new Error("Graph PDF conversion failed");
 
+    if (!pdfRes.ok) {
+      const errText = await pdfRes.text();
+      console.error("❌ Graph PDF conversion failed:", errText);
+      throw new Error(`Graph PDF conversion failed: ${errText}`);
+    }
+
+    // Stream PDF back
     res.setHeader("Content-Type", "application/pdf");
     res.setHeader("Content-Disposition", "attachment; filename=Application_Form.pdf");
     pdfRes.body.pipe(res);
 
-    // Cleanup temp upload
     await fs.promises.unlink(req.file.path).catch(() => {});
   } catch (err) {
     console.error("❌ Error converting with Graph:", err);
-    res.status(500).send("Conversion failed");
+    res.status(500).send("Conversion failed: " + err.message);
   }
 });
 
