@@ -1,7 +1,7 @@
-# Ignore client build (handled by Vercel)
+# Exclude React client build (Vercel handles this), but keep utils
 client/*
-!client/src/utils/countries.js
-!client/src/utils/nationalities.js
+!client/src/
+!client/src/utils/
 
 # Ignore local node_modules
 node_modules/
@@ -20,11 +20,11 @@ yarn-error.log
 .git
 .gitignore
 
-# Ignore Dockerfile artifacts
+# Ignore Docker/Dockerignore files
 Dockerfile*
 .dockerignore
 
-# Ignore OS / editor files
+# Ignore OS/editor junk
 .DS_Store
 Thumbs.db
 *.swp

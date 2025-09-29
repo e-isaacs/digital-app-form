@@ -19,8 +19,9 @@ RUN npm install
 # Copy the rest of the server code
 COPY server/ .
 
-COPY client/src/utils/countries.js ./client/src/utils/countries.js
-COPY client/src/utils/nationalities.js ./client/src/utils/nationalities.js
+# Copy required client utils (for backend routes)
+RUN mkdir -p /app/client/src
+COPY client/src/utils /app/client/src/utils
 
 # Expose the server port
 EXPOSE 5000
