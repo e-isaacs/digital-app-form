@@ -318,12 +318,13 @@ export default function ConsentPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const pdfRes = await fetch(`${process.env.REACT_APP_API_URL}/crm/${guid}`, {
+      // Submit route → upload DOCX, Cloudmersive converts, then backend saves to SharePoint
+      const pdfRes = await fetch(`${process.env.REACT_APP_API_URL}/save-pdf/${guid}`, {
         method: "POST",
         body: formData,
       });
       if (!pdfRes.ok) throw new Error(await pdfRes.text());
-      console.log("✅ Application PDF converted + uploaded to SharePoint");
+      console.log("✅ Application PDF converted via Cloudmersive + uploaded to SharePoint");
       setLoading(false);
 
       // 8️⃣ Create CRM Task
@@ -575,7 +576,8 @@ export default function ConsentPage() {
       const formData = new FormData();
       formData.append("file", file);
 
-      const pdfResponse = await fetch(`${process.env.REACT_APP_API_URL}/convert-pdf`, {
+      // Direct download via Cloudmersive conversion endpoint
+      const pdfResponse = await fetch(`${process.env.REACT_APP_API_URL}/download-pdf`, {
         method: "POST",
         body: formData,
       });
@@ -586,6 +588,7 @@ export default function ConsentPage() {
 
       const pdfBlob = await pdfResponse.blob();
       saveAs(pdfBlob, "Application_Form.pdf");
+
     } catch (err) {
       console.error("Error converting to PDF:", err);
       alert("Could not generate PDF. Please try again.");
