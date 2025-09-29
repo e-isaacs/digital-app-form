@@ -70,16 +70,26 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
     // 3️⃣ Prepare SharePoint path
     const folderUrl = new URL(folderLink);
     let driveFolderPath = decodeURI(folderUrl.pathname).trim();
+    console.log("📂 Raw folder path from link:", driveFolderPath);
+
     const siteRoot = "/sites/" + process.env.SHAREPOINT_SITE_NAME;
     if (driveFolderPath.startsWith(siteRoot)) {
       driveFolderPath = driveFolderPath.substring(siteRoot.length);
     }
+    // Example now: /Shared Documents/opportunity/12345 Test
+
+    // 🔹 Strip "Shared Documents/opportunity/" so only folder remains
     driveFolderPath = driveFolderPath.replace(/^\/Shared Documents\/opportunity\//, "/");
+
+    // Ensure clean leading slash
     if (!driveFolderPath.startsWith("/")) {
       driveFolderPath = "/" + driveFolderPath;
     }
+
+    // Final path should now look like: /12345 Test
     const encodedPath = encodeDrivePath(driveFolderPath);
-    console.log("📂 Final SharePoint folder path:", driveFolderPath);
+    console.log("📂 Final folder path for Graph API:", driveFolderPath);
+    console.log("📂 Encoded folder path for Graph API:", encodedPath);
 
     // 4️⃣ Upload to SharePoint via Graph
     const siteIdParts = process.env.SHAREPOINT_SITE_ID.split(",");
