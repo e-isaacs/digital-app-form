@@ -34,7 +34,7 @@ async function getGraphAccessToken() {
 
 // 🔴 OLD: router.post("/:opportunityId")
 // 🟢 NEW: keep endpoint the same as before → /crm/:opportunityId
-router.post("/crm/:opportunityId", upload.single("file"), async (req, res) => {
+router.post("/:opportunityId", upload.single("file"), async (req, res) => {
   const { opportunityId } = req.params;
   console.log(`📥 Incoming request → saveAppFormPDF for opportunityId: ${opportunityId}`);
 

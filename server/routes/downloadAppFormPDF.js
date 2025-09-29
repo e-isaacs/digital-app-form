@@ -31,7 +31,7 @@ async function getGraphAccessToken() {
 
 // 🔴 OLD: router.post("/", …)
 // 🟢 NEW: keep endpoint the same → /convert-pdf
-router.post("/convert-pdf", upload.single("file"), async (req, res) => {
+router.post("/", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
