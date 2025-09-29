@@ -9,14 +9,41 @@ router.post("/update-opportunity-company/:id", async (req, res) => {
   const { id } = req.params; // Opportunity GUID
   const { isCompany, companyName, companyNumber } = req.body;
 
-  if (!isCompany) {
-    return res.json({ status: "skipped", message: "Not a company application" });
-  }
-
   try {
     const token = await getDynamicsToken();
     const instanceUrl = process.env.DYNAMICS_INSTANCE_URL;
 
+    // 🔹 Case 1: Not a company → clear fields
+    if (!isCompany) {
+      const oppUrl = `${instanceUrl}/api/data/v9.0/opportunities(${id})`;
+      const oppPayload = {
+        "parentaccountid@odata.bind": null,
+        inh_companyname: "",
+        inh_registrationnumber: ""
+      };
+
+      const oppRes = await fetch(oppUrl, {
+        method: "PATCH",
+        headers: {
+          Authorization: `Bearer ${token}`,
+          "Content-Type": "application/json",
+          "If-Match": "*",
+        },
+        body: JSON.stringify(oppPayload),
+      });
+
+      if (!oppRes.ok) {
+        const errText = await oppRes.text();
+        throw new Error(`Failed to clear company fields: ${errText}`);
+      }
+
+      return res.json({
+        status: "ok",
+        message: "Opportunity cleared of company details",
+      });
+    }
+
+    // 🔹 Case 2: Company → find or create account, then link
     // --- 1. Try to find existing Account by companyNumber ---
     let accountId = null;
     if (companyNumber) {
