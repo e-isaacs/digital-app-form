@@ -190,7 +190,6 @@ export default function ConsentPage() {
       const imageModule = new ImageModule({
         getImage: (tagValue) => {
           if (!tagValue) return null;
-          // strip the base64 prefix
           const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
           const binary = atob(base64Data);
           const len = binary.length;
@@ -198,10 +197,13 @@ export default function ConsentPage() {
           for (let i = 0; i < len; i++) {
             bytes[i] = binary.charCodeAt(i);
           }
-          // ✅ return ArrayBuffer for image module
+          // ✅ return Buffer in Node.js, ArrayBuffer in browser
+          if (typeof Buffer !== "undefined") {
+            return Buffer.from(bytes);
+          }
           return bytes.buffer;
         },
-        getSize: () => [200, 80], // adjust signature image size
+        getSize: () => [200, 80],
       });
 
       const doc = new Docxtemplater(zip, { modules: [imageModule] });
@@ -360,16 +362,20 @@ export default function ConsentPage() {
         getImage: function (tagValue) {
           if (!tagValue) return null;
           const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
-          const byteCharacters = atob(base64Data);
-          const byteNumbers = new Array(byteCharacters.length);
-          for (let i = 0; i < byteCharacters.length; i++) {
-            byteNumbers[i] = byteCharacters.charCodeAt(i);
+          const binary = atob(base64Data);
+          const len = binary.length;
+          const bytes = new Uint8Array(len);
+          for (let i = 0; i < len; i++) {
+            bytes[i] = binary.charCodeAt(i);
           }
-          return new Uint8Array(byteNumbers);
+          // ✅ return Buffer in Node.js, ArrayBuffer in browser
+          if (typeof Buffer !== "undefined") {
+            return Buffer.from(bytes);
+          }
+          return bytes.buffer;
         },
         getSize: function () {
-          // must return a 2-element array [width, height]
-          return [200, 80]; // width & height in pixels
+          return [200, 80];
         },
       };
 
