@@ -29,7 +29,9 @@ async function getGraphAccessToken() {
   return json.access_token;
 }
 
-router.post("/", upload.single("file"), async (req, res) => {
+// 🔴 OLD: router.post("/", …)
+// 🟢 NEW: keep endpoint the same → /convert-pdf
+router.post("/convert-pdf", upload.single("file"), async (req, res) => {
   if (!req.file) {
     return res.status(400).send("No file uploaded.");
   }
@@ -67,7 +69,7 @@ router.post("/", upload.single("file"), async (req, res) => {
     res.setHeader("Content-Disposition", "attachment; filename=Application_Form.pdf");
     pdfRes.body.pipe(res);
 
-    // Cleanup uploaded temp DOCX
+    // Cleanup temp upload
     await fs.promises.unlink(req.file.path).catch(() => {});
   } catch (err) {
     console.error("❌ Error converting with Graph:", err);

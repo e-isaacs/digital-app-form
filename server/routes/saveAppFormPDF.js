@@ -32,7 +32,9 @@ async function getGraphAccessToken() {
   return json.access_token;
 }
 
-router.post("/:opportunityId", upload.single("file"), async (req, res) => {
+// 🔴 OLD: router.post("/:opportunityId")
+// 🟢 NEW: keep endpoint the same as before → /crm/:opportunityId
+router.post("/crm/:opportunityId", upload.single("file"), async (req, res) => {
   const { opportunityId } = req.params;
   console.log(`📥 Incoming request → saveAppFormPDF for opportunityId: ${opportunityId}`);
 
@@ -42,7 +44,7 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
   }
 
   try {
-    // 1️⃣ Fetch inh_folderlink from Dynamics (for logging + validation)
+    // 1️⃣ Validate opportunity exists in Dynamics
     console.log("🔎 Fetching inh_folderlink from Dynamics...");
     const token = await getDynamicsToken();
     const instanceUrl = process.env.DYNAMICS_INSTANCE_URL;
@@ -58,7 +60,7 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
     console.log("📂 Dynamics inh_folderlink:", folderLink);
     if (!folderLink) throw new Error("No inh_folderlink set on opportunity");
 
-    // 2️⃣ Upload DOCX to SharePoint
+    // 2️⃣ Upload DOCX to SharePoint via Graph
     const siteIdParts = process.env.SHAREPOINT_SITE_ID.split(",");
     const graphSiteId = siteIdParts[1];
     const driveId = process.env.SHAREPOINT_OPPORTUNITY_DRIVE_ID;
@@ -81,7 +83,7 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
     const uploaded = await uploadRes.json();
     console.log("✅ DOCX uploaded:", uploaded.id);
 
-    // 3️⃣ Ask Graph to return PDF version
+    // 3️⃣ Ask Graph to convert to PDF
     const itemId = uploaded.id;
     const pdfUrl = `https://graph.microsoft.com/v1.0/sites/${graphSiteId}/drives/${driveId}/items/${itemId}/content?format=pdf`;
 
@@ -94,11 +96,11 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
 
     res.json({
       status: "ok",
-      message: "Application PDF generated and stored",
+      message: "Application PDF generated + uploaded via Graph",
       size: pdfData.byteLength,
     });
 
-    // Cleanup uploaded temp DOCX
+    // Cleanup temp upload
     await fs.promises.unlink(req.file.path).catch(() => {});
   } catch (err) {
     console.error("❌ Error in saveAppFormPDF:", err);
