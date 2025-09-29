@@ -186,19 +186,19 @@ export default function ConsentPage() {
 
       // 7️⃣ Generate DOCX with same dataset as Print + upload for conversion/storage
       const zip = new PizZip(await (await fetch("/templates/application_form.docx")).arrayBuffer());
+
       const imageModule = new ImageModule({
         getImage: (tagValue) => {
           if (!tagValue) return null;
-          const base64Data = tagValue.replace(/^data:image\/png;base64,/, "");
-          const binary = atob(base64Data);
-          const len = binary.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
-            bytes[i] = binary.charCodeAt(i);
+          const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
           }
-          return bytes;
+          return new Uint8Array(byteNumbers);
         },
-        getSize: () => [200, 80],
+        getSize: () => [200, 80], // adjust signature size
       });
 
       const doc = new Docxtemplater(zip, { modules: [imageModule] });
@@ -356,31 +356,19 @@ export default function ConsentPage() {
       const imageOpts = {
         getImage: function (tagValue) {
           if (!tagValue) return null;
-          const base64Data = tagValue.replace(/^data:image\/png;base64,/, "");
-          const binary = atob(base64Data); // decode base64
-          const len = binary.length;
-          const bytes = new Uint8Array(len);
-          for (let i = 0; i < len; i++) {
-            bytes[i] = binary.charCodeAt(i);
+          const base64Data = tagValue.replace(/^data:image\/(png|jpeg);base64,/, "");
+          const byteCharacters = atob(base64Data);
+          const byteNumbers = new Array(byteCharacters.length);
+          for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
           }
-          return bytes;
+          return new Uint8Array(byteNumbers);
         },
         getSize: function () {
           // must return a 2-element array [width, height]
           return [200, 80]; // width & height in pixels
         },
       };
-
-      // Convert ArrayBuffer → base64 (browser-safe)
-      function arrayBufferToBase64(buffer) {
-        let binary = '';
-        const bytes = new Uint8Array(buffer);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        return window.btoa(binary);
-      }
 
       const imageModule = new ImageModule(imageOpts);
 
