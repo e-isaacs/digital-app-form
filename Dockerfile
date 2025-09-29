@@ -1,7 +1,7 @@
-# Use an official Node LTS image
+# Use Node LTS base
 FROM node:18-bullseye
 
-# Install LibreOffice (headless mode)
+# Install LibreOffice
 RUN apt-get update && apt-get install -y \
     libreoffice \
     libreoffice-writer \
@@ -11,17 +11,16 @@ RUN apt-get update && apt-get install -y \
 # Set working directory
 WORKDIR /app
 
-# Copy package files
-COPY package*.json ./
-
-# Install dependencies
+# Copy server package files and install deps
+COPY server/package*.json ./server/
+WORKDIR /app/server
 RUN npm install
 
-# Copy app source
-COPY . .
+# Copy the rest of the server code
+COPY server/ .
 
-# Expose your server port (usually 5000)
+# Expose the server port
 EXPOSE 5000
 
-# Start server
+# Start the server
 CMD ["npm", "start"]
