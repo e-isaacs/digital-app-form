@@ -54,8 +54,16 @@ export default function ApplicationForm() {
 
   // Applicants & Securities
   const [applicants, setApplicants] = useState(
-    state?.signedApplicants || state?.applicants || []
+    state?.signedApplicants ||
+    state?.applicants ||
+    JSON.parse(localStorage.getItem("applicants") || "[]")
   );
+
+  // 🔹 Keep applicants in sync with localStorage
+  useEffect(() => {
+    localStorage.setItem("applicants", JSON.stringify(applicants));
+  }, [applicants]);
+
   const [securities, setSecurities] = useState(state?.securities || []);
 
   const [showApplicantDialog, setShowApplicantDialog] = useState(false);
@@ -64,7 +72,7 @@ export default function ApplicationForm() {
   const [showSecurityDialog, setShowSecurityDialog] = useState(false);
   const [editSecurityIndex, setEditSecurityIndex] = useState(null);
 
-    useEffect(() => {
+  useEffect(() => {
     async function fetchApplication() {
       if (!state) {
         try {
@@ -75,10 +83,30 @@ export default function ApplicationForm() {
 
           setIsCompany(data.isCompany || false);
           setCompanyData(data.companyData || null);
-          setApplicants(data.applicants || []);
-          setSecurities(data.securities || []);
-          setLoanAmount(data.loanAmount || "");
-          setLoanTerm(data.loanTerm || "");
+
+          // 🔹 Prefer localStorage if available
+          const savedApplicants = JSON.parse(localStorage.getItem("applicants") || "[]");
+          setApplicants(savedApplicants.length > 0 ? savedApplicants : (data.applicants || []));
+
+          // 🔹 Same idea for securities if you want them persistent
+          const savedSecurities = JSON.parse(localStorage.getItem("securities") || "[]");
+          setSecurities(savedSecurities.length > 0 ? savedSecurities : (data.securities || []));
+
+          // 🔹 Format loan amount as currency
+          setLoanAmount(
+            data.loanAmount
+              ? Number(data.loanAmount.toString().replace(/[^0-9.]/g, ""))
+                  .toLocaleString("en-GB", { style: "currency", currency: "GBP" })
+              : ""
+          );
+
+          // 🔹 Format loan term with "months"
+          setLoanTerm(
+            data.loanTerm && !isNaN(parseInt(data.loanTerm, 10))
+              ? `${parseInt(data.loanTerm, 10)} months`
+              : ""
+          );
+
           setSourceOfDeposit(data.sourceOfDeposit || "");
           setLoanPurposeDetail(data.loanPurposeDetail || "");
           setFundsRequiredBy(data.fundsRequiredBy || "");
@@ -396,75 +424,83 @@ export default function ApplicationForm() {
               />
             )}
             </section>
-            {applicants.map((a, i) => {
-              const percent = calculateApplicantCompletion(a);
-              return (
-                <div key={i} className="form-card">
-                  <div>
-                    {a.salutation
-                      ? a.salutation.charAt(0).toUpperCase() + a.salutation.slice(1)
-                      : ""}{" "}
-                    {a.firstName} {a.lastName}
-                  </div>
-
-                  <div className={getBadgeClass(percent)}>{percent}% Complete</div>
-
-                  <div className="actions">
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => setEditApplicantIndex(i)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-secondary"
-                      onClick={() => {
-                        if (window.confirm("Delete this applicant?")) {
-                          const updated = [...applicants];
-                          updated.splice(i, 1);
-                          setApplicants(updated);
-                        }
-                      }}
-                    >
-                      Delete
-                    </button>
-                  </div>
+        {applicants.map((a, i) => {
+          const percent = calculateApplicantCompletion(a);
+          return (
+            <div key={i}>
+              {/* Applicant summary card */}
+              <div className="form-card">
+                <div>
+                  {a.salutation ? a.salutation.charAt(0).toUpperCase() + a.salutation.slice(1) : ""}{" "}
+                  {a.firstName} {a.lastName}
                 </div>
-              );
-            })}
-          {editApplicantIndex === null && !showApplicantDialog && (
-            <button
-              type="button"
-              onClick={() => setShowApplicantDialog(true)}
-              className="btn btn-secondary"
-            >
-              + Add Applicant
-            </button>
-          )}
-          {(showApplicantDialog || editApplicantIndex !== null) && (
+
+                <div className={getBadgeClass(percent)}>{percent}% Complete</div>
+
+                <div className="actions">
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setEditApplicantIndex(i)}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => {
+                      if (window.confirm("Delete this applicant?")) {
+                        const updated = [...applicants];
+                        updated.splice(i, 1);
+                        setApplicants(updated);
+                      }
+                    }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+
+              {/* 🔹 Separate container for the dialog under this applicant */}
+              {editApplicantIndex === i && (
+                <div className="form-subcontainer">
+                  <ApplicantDialog
+                    initialData={applicants[i]}
+                    onClose={() => setEditApplicantIndex(null)}
+                    onSave={(updatedApplicant) => {
+                      const updated = [...applicants];
+                      updated[i] = updatedApplicant;
+                      setApplicants(updated);
+                      setEditApplicantIndex(null);
+                    }}
+                  />
+                </div>
+              )}
+            </div>
+          );
+        })}
+
+        {/* For adding new applicants */}
+        {editApplicantIndex === null && !showApplicantDialog && (
+          <button
+            type="button"
+            onClick={() => setShowApplicantDialog(true)}
+            className="btn btn-secondary"
+          >
+            + Add Applicant
+          </button>
+        )}
+        {showApplicantDialog && (
+          <div className="form-subcontainer">
             <ApplicantDialog
-              initialData={
-                editApplicantIndex !== null ? applicants[editApplicantIndex] : null
-              }
-              onClose={() => {
+              onClose={() => setShowApplicantDialog(false)}
+              onSave={(newApplicant) => {
+                setApplicants([...applicants, newApplicant]);
                 setShowApplicantDialog(false);
-                setEditApplicantIndex(null);
-              }}
-              onSave={(applicant) => {
-                if (editApplicantIndex !== null) {
-                  const updated = [...applicants];
-                  updated[editApplicantIndex] = applicant;
-                  setApplicants(updated);
-                  setEditApplicantIndex(null);
-                } else {
-                  setApplicants([...applicants, applicant]);
-                  setShowApplicantDialog(false);
-                }
               }}
             />
-          )}
+          </div>
+        )}
         </section>
 
         {/* Securities */}
@@ -473,36 +509,57 @@ export default function ApplicationForm() {
           {securities.map((s, i) => {
             const percent = calculateSecurityCompletion(s);
             return (
-              <div key={i} className="form-card">
-                <div>{formatAddressPreview(s)}</div>
+              <div key={i}>
+                {/* Security summary card */}
+                <div className="form-card">
+                  <div>{formatAddressPreview(s)}</div>
 
-                <div className={getBadgeClass(percent)}>{percent}% Complete</div>
+                  <div className={getBadgeClass(percent)}>{percent}% Complete</div>
 
-                <div className="actions">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setEditSecurityIndex(i)}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => {
-                      if (window.confirm("Delete this security?")) {
-                        const updated = [...securities];
-                        updated.splice(i, 1);
-                        setSecurities(updated);
-                      }
-                    }}
-                  >
-                    Delete
-                  </button>
+                  <div className="actions">
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => setEditSecurityIndex(i)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-secondary"
+                      onClick={() => {
+                        if (window.confirm("Delete this security?")) {
+                          const updated = [...securities];
+                          updated.splice(i, 1);
+                          setSecurities(updated);
+                        }
+                      }}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
+
+                {/* 🔹 Separate container for editing this security */}
+                {editSecurityIndex === i && (
+                  <div className="form-subcontainer">
+                    <SecurityDialog
+                      initialData={securities[i]}
+                      onClose={() => setEditSecurityIndex(null)}
+                      onSave={(updatedSecurity) => {
+                        const updated = [...securities];
+                        updated[i] = updatedSecurity;
+                        setSecurities(updated);
+                        setEditSecurityIndex(null);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             );
           })}
+
+          {/* For adding new securities */}
           {editSecurityIndex === null && !showSecurityDialog && (
             <button
               type="button"
@@ -512,27 +569,16 @@ export default function ApplicationForm() {
               + Add Security
             </button>
           )}
-          {(showSecurityDialog || editSecurityIndex !== null) && (
-            <SecurityDialog
-              initialData={
-                editSecurityIndex !== null ? securities[editSecurityIndex] : null
-              }
-              onClose={() => {
-                setShowSecurityDialog(false);
-                setEditSecurityIndex(null);
-              }}
-              onSave={(security) => {
-                if (editSecurityIndex !== null) {
-                  const updated = [...securities];
-                  updated[editSecurityIndex] = security;
-                  setSecurities(updated);
-                  setEditSecurityIndex(null);
-                } else {
-                  setSecurities([...securities, security]);
+          {showSecurityDialog && (
+            <div className="form-subcontainer">
+              <SecurityDialog
+                onClose={() => setShowSecurityDialog(false)}
+                onSave={(newSecurity) => {
+                  setSecurities([...securities, newSecurity]);
                   setShowSecurityDialog(false);
-                }
-              }}
-            />
+                }}
+              />
+            </div>
           )}
         </section>
 

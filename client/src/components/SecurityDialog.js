@@ -57,9 +57,12 @@ export default function SecurityDialog({ onClose, onSave, initialData }) {
       setCounty(initialData.county || "");
       setCountry(initialData.country || "");
       setPropertyType(initialData.propertyType || "");
-      setEstimatedValue(initialData.estimatedValue || "");
-      setOutstandingBalance(initialData.outstandingBalance || "");
-      setPurchasePrice(initialData.purchasePrice || "");
+
+      // 🔹 Format currency fields immediately
+      setEstimatedValue(formatCurrency(initialData.estimatedValue || ""));
+      setOutstandingBalance(formatCurrency(initialData.outstandingBalance || ""));
+      setPurchasePrice(formatCurrency(initialData.purchasePrice || ""));
+
       setFirstChargeLender(initialData.firstChargeLender || "");
       setLoanPurpose(initialData.loanPurpose || []);
       setChargeType(initialData.chargeType || "");

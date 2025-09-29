@@ -169,7 +169,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
 
   // Save
   const handleSave = () => {
-    onSave({
+    const applicantData = {
       salutation,
       firstName,
       lastName,
@@ -214,7 +214,9 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       address3ResidentialStatus,
 
       creditHistory,
-    });
+    };
+
+    onSave(applicantData);
     onClose();
   };
 
