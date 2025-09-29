@@ -78,15 +78,17 @@ router.post("/:opportunityId", upload.single("file"), async (req, res) => {
     }
     // Example now: /Shared Documents/opportunity/12345 Test
 
-    // 🔹 Strip "Shared Documents/opportunity/" so only folder remains
-    driveFolderPath = driveFolderPath.replace(/^\/Shared Documents\/opportunity\//, "/");
+    // 🔹 Always remove "/Shared Documents/opportunity/" prefix if present
+    driveFolderPath = driveFolderPath.replace(/^\/Shared Documents\/opportunity\//i, "/");
+
+    // 🔹 Also remove leading "/opportunity/" if still present
+    driveFolderPath = driveFolderPath.replace(/^\/opportunity\//i, "/");
 
     // Ensure clean leading slash
     if (!driveFolderPath.startsWith("/")) {
       driveFolderPath = "/" + driveFolderPath;
     }
 
-    // Final path should now look like: /12345 Test
     const encodedPath = encodeDrivePath(driveFolderPath);
     console.log("📂 Final folder path for Graph API:", driveFolderPath);
     console.log("📂 Encoded folder path for Graph API:", encodedPath);

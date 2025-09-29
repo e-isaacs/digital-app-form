@@ -124,23 +124,21 @@ export default function ConsentPage() {
       if (!securitiesRes.ok) throw new Error(await securitiesRes.text());
       console.log("✅ Securities updated");
 
-      // 4️⃣ Update company (if isCompany = true)
-      if (isCompany) {
-        const companyRes = await fetch(
-          `${process.env.REACT_APP_API_URL}/crm/update-opportunity-company/${guid}`,
-          {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({
-              isCompany,
-              companyName: companyData?.companyName,
-              companyNumber: companyData?.companyNumber,
-            }),
-          }
-        );
-        if (!companyRes.ok) throw new Error(await companyRes.text());
-        console.log("✅ Company updated");
-      }
+      // 4️⃣ Update company (always run: clears fields if isCompany = false)
+      const companyRes = await fetch(
+        `${process.env.REACT_APP_API_URL}/crm/update-opportunity-company/${guid}`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            isCompany,
+            companyName: companyData?.companyName,
+            companyNumber: companyData?.companyNumber,
+          }),
+        }
+      );
+      if (!companyRes.ok) throw new Error(await companyRes.text());
+      console.log("✅ Company updated (linked or cleared)");
 
       // 5️⃣ Update solicitor
       if (state.sraNumber) {
