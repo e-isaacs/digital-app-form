@@ -1,7 +1,8 @@
 import { useParams, useNavigate, useLocation } from "react-router-dom";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import axios from "axios";
 import Select from "react-select";
+import debounce from "lodash.debounce";
 import ApplicantDialog from "../components/ApplicantDialog";
 import SecurityDialog from "../components/SecurityDialog";
 import CompanyDetails from "../components/CompanyDetails";
@@ -12,6 +13,11 @@ import { findBySraNumber, searchByName } from "../utils/solicitors";
 
 export default function ApplicationForm() {
   const { guid } = useParams();
+
+  const [formData, setFormData] = useState({});
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -22,6 +28,13 @@ export default function ApplicationForm() {
     JSON.parse(localStorage.getItem("companyData") || "null") ||
     null
   );
+
+  // 🔹 Keep companyData in sync with localStorage
+  useEffect(() => {
+    if (isCompany && companyData) {
+      localStorage.setItem("companyData", JSON.stringify(companyData));
+    }
+  }, [isCompany, companyData]);
 
   // Loan details
   const [loanAmount, setLoanAmount] = useState(state?.loanAmount || "");
@@ -136,6 +149,69 @@ export default function ApplicationForm() {
 
     fetchApplication();
   }, [guid, state]);
+
+  // ---------------------------
+  // 🔄 Debounced autosave (for all direct form fields)
+  // ---------------------------
+  const debouncedSaveRef = useRef();
+
+  if (!debouncedSaveRef.current) {
+    debouncedSaveRef.current = debounce(async (data) => {
+      try {
+        setSaving(true);
+        setSaveError(null);
+        await axios.post(`${process.env.REACT_APP_API_URL}/applications/${guid}/autosave`, data);
+        setSaving(false);
+      } catch (err) {
+        console.error("❌ Autosave failed:", err);
+        setSaving(false);
+        setSaveError("Autosave failed");
+      }
+    }, 600);
+  }
+
+  // Build the current snapshot of top-level fields to save
+  const buildFormSnapshot = useCallback(() => ({
+    isCompany,
+    companyData,
+    loanAmount,
+    loanTerm,
+    sourceOfDeposit,
+    loanPurposeDetail,
+    fundsRequiredBy,
+    exitStrategy,
+    exitOtherExplain,
+    exitRefinanceLender,
+    solicitorName,
+    sraNumber,
+    solicitorAddress,
+    solicitorActing,
+    solicitorContactNumber,
+    solicitorContactEmail,
+  }), [
+    isCompany,
+    companyData,
+    loanAmount,
+    loanTerm,
+    sourceOfDeposit,
+    loanPurposeDetail,
+    fundsRequiredBy,
+    exitStrategy,
+    exitOtherExplain,
+    exitRefinanceLender,
+    solicitorName,
+    sraNumber,
+    solicitorAddress,
+    solicitorActing,
+    solicitorContactNumber,
+    solicitorContactEmail
+  ]);
+
+  // Autosave whenever any top-level field changes
+  useEffect(() => {
+    const snapshot = buildFormSnapshot();
+    debouncedSaveRef.current(snapshot);
+  }, [buildFormSnapshot]);
 
   const EXIT_STRATEGY_OPTIONS = [
     { value: "Sale of security", label: "Sale of security" },

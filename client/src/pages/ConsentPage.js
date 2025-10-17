@@ -1,11 +1,14 @@
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, useCallback } from "react";
 import Header from "../components/Header";
 import ConsentSignatureCard from "../components/ConsentSignatureCard";
 import PizZip from "pizzip";
 import Docxtemplater from "docxtemplater";
 import ImageModule from "docxtemplater-image-module-free";
 import { saveAs } from "file-saver";
+import axios from "axios";
+import debounce from "lodash.debounce";
+
 
 export default function ConsentPage() {  
   const { guid } = useParams();
@@ -34,6 +37,39 @@ export default function ConsentPage() {
       consentPreferences: a.consentPreferences || { email: false, telephone: false, sms: false },
     }))
   );
+
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
+  // 🔄 Debounced autosave for signatures & consent preferences
+  const debouncedSaveRef = useRef();
+  if (!debouncedSaveRef.current) {
+    debouncedSaveRef.current = debounce(async (data) => {
+      try {
+        setSaving(true);
+        setSaveError(null);
+        await axios.post(`${process.env.REACT_APP_API_URL}/applications/${guid}/autosave`, data);
+        setSaving(false);
+      } catch (err) {
+        console.error("❌ Autosave failed:", err);
+        setSaving(false);
+        setSaveError("Autosave failed");
+      }
+    }, 800);
+  }
+
+  // 🧩 Build snapshot for autosave
+  const buildConsentSnapshot = useCallback(() => ({
+    signedApplicants,
+  }), [signedApplicants]);
+
+  // 🕒 Trigger autosave whenever applicant signatures change
+  useEffect(() => {
+    if (signedApplicants && signedApplicants.length > 0) {
+      const snapshot = buildConsentSnapshot();
+      debouncedSaveRef.current(snapshot);
+    }
+  }, [buildConsentSnapshot]);
 
   // ✅ persist updates to localStorage
   useEffect(() => {
@@ -161,7 +197,20 @@ export default function ConsentPage() {
         console.log("✅ Solicitor updated");
       }
 
+      // Helper to format YYYY-MM-DD → DD/MM/YYYY
+      function formatDateToDDMMYYYY(dateStr) {
+        if (!dateStr) return null;
+        const d = new Date(dateStr);
+        if (isNaN(d)) return dateStr;
+        const day = String(d.getDate()).padStart(2, "0");
+        const month = String(d.getMonth() + 1).padStart(2, "0");
+        const year = d.getFullYear();
+        return `${day}/${month}/${year}`;
+      }
+
       // 6️⃣ Update remaining opportunity details
+      const formattedFundsRequiredBy = formatDateToDDMMYYYY(state.fundsRequiredBy);
+
       const detailsRes = await fetch(
         `${process.env.REACT_APP_API_URL}/crm/update-opportunity-details/${guid}`,
         {
@@ -170,7 +219,7 @@ export default function ConsentPage() {
           body: JSON.stringify({
             loanAmount: state.loanAmount,
             loanTerm: state.loanTerm,
-            fundsRequiredBy: state.fundsRequiredBy,
+            fundsRequiredBy: formattedFundsRequiredBy,
             sourceOfDeposit: state.sourceOfDeposit,
             loanPurposeDetail: state.loanPurposeDetail,
             exitStrategy: state.exitStrategy,

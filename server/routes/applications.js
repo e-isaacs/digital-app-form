@@ -31,6 +31,26 @@ router.post("/crm/create-application", async (req, res) => {
   }
 });
 
+// Autosave partial updates (lightweight)
+router.post("/:id/autosave", async (req, res) => {
+  const { id } = req.params;
+  const partialData = req.body;
+  try {
+    const existing = await pool.query("SELECT data FROM applications WHERE id = $1::uuid", [id]);
+    const current = existing.rows[0]?.data || {};
+    const merged = { ...current, ...partialData };
+    await pool.query(
+      "UPDATE applications SET data = $2, updated_at = NOW() WHERE id = $1",
+      [id, merged]
+    );
+    res.json({ status: "ok", message: "Autosaved" });
+  } catch (err) {
+    console.error("❌ Autosave error:", err);
+    res.status(500).json({ error: "Autosave failed" });
+  }
+});
+
+
 // Fetch application
 router.get("/:id", async (req, res) => {
   const { id } = req.params;

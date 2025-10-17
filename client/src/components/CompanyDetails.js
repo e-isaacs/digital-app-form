@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
+import { useParams } from "react-router-dom";
 import axios from "axios";
+import debounce from "lodash.debounce";
 import { FaEdit, FaTrash, FaCheck, FaTimes } from "react-icons/fa";
 
 const API_BASE =
@@ -20,9 +22,47 @@ function cleanName(name) {
 }
 
 export default function CompanyDetails({ initialData, onChange }) {
-  const [companyName, setCompanyName] = useState(initialData?.companyName || "");
-  const [companyNumber, setCompanyNumber] = useState(initialData?.companyNumber || "");
-  const [shareholders, setShareholders] = useState(initialData?.shareholders || []);
+const [companyName, setCompanyName] = useState(initialData?.companyName || "");
+const [companyNumber, setCompanyNumber] = useState(initialData?.companyNumber || "");
+const [shareholders, setShareholders] = useState(initialData?.shareholders || []);
+
+const { guid } = useParams();
+const [saving, setSaving] = useState(false);
+const [saveError, setSaveError] = useState(null);
+
+// Debounced autosave setup
+const debouncedSaveRef = useRef();
+if (!debouncedSaveRef.current) {
+  debouncedSaveRef.current = debounce(async (data) => {
+    try {
+      setSaving(true);
+      setSaveError(null);
+      await axios.post(`${process.env.REACT_APP_API_URL}/applications/${guid}/autosave`, data);
+      setSaving(false);
+    } catch (err) {
+      console.error("❌ Autosave failed:", err);
+      setSaving(false);
+      setSaveError("Autosave failed");
+    }
+  }, 600);
+}
+
+// Build current snapshot for autosave
+const buildCompanySnapshot = useCallback(() => ({
+  companyData: {
+    companyName,
+    companyNumber,
+    shareholders,
+  },
+  isCompany: true,
+}), [companyName, companyNumber, shareholders]);
+
+// Trigger autosave when fields change
+useEffect(() => {
+  const snapshot = buildCompanySnapshot();
+  debouncedSaveRef.current(snapshot);
+}, [buildCompanySnapshot]);
+
   const [searchResults, setSearchResults] = useState([]);
 
   const [newRowVisible, setNewRowVisible] = useState(true);
@@ -103,6 +143,15 @@ export default function CompanyDetails({ initialData, onChange }) {
     if (!newRow.name || !newRow.percentage) return;
     const updated = [...shareholders, newRow];
     handleShareholdersChange(updated);
+
+    // 🔹 Persist immediately when a new row is added
+    const safeCompanyData = {
+      companyName,
+      companyNumber,
+      shareholders: updated,
+    };
+    localStorage.setItem("companyData", JSON.stringify(safeCompanyData));
+
     setNewRow({ name: "", percentage: "" });
     setNewRowVisible(true);
   };
@@ -111,6 +160,14 @@ export default function CompanyDetails({ initialData, onChange }) {
     if (!window.confirm("Remove this shareholder?")) return;
     const updated = shareholders.filter((_, idx) => idx !== i);
     handleShareholdersChange(updated);
+
+    // 🔹 Persist after deletion
+    const safeCompanyData = {
+      companyName,
+      companyNumber,
+      shareholders: updated,
+    };
+    localStorage.setItem("companyData", JSON.stringify(safeCompanyData));
   };
 
   const handleEdit = (i) => {
@@ -122,6 +179,15 @@ export default function CompanyDetails({ initialData, onChange }) {
     const updated = [...shareholders];
     updated[i] = editData;
     handleShareholdersChange(updated);
+
+    // 🔹 Persist company data (including shareholders) into localStorage
+    const safeCompanyData = {
+      companyName,
+      companyNumber,
+      shareholders: updated,
+    };
+    localStorage.setItem("companyData", JSON.stringify(safeCompanyData));
+
     setEditIndex(null);
   };
 
@@ -154,7 +220,7 @@ export default function CompanyDetails({ initialData, onChange }) {
             className="btn btn-primary"
             style={{ flex: 1 }}
           >
-            Search Companies House
+            Search Companies
           </button>
         </div>
       </div>
