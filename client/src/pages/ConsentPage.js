@@ -555,6 +555,7 @@ export default function ConsentPage() {
 
         // Securities
         securities: securities.map((s) => ({
+          propertyName: s.propertyName,
           line1: s.line1,
           line2: s.line2,
           line3: s.line3,
@@ -805,7 +806,7 @@ export default function ConsentPage() {
             {securities.map((s, i) => (
               <div key={i} style={{ marginBottom: "10px" }}>
                 <p>
-                  {s.line1}, {s.town} {s.postcode}
+                  {s.propertyName}, {s.line1}, {s.town} {s.postcode}
                 </p>
                 <p>Estimated Value: {s.estimatedValue}</p>
               </div>

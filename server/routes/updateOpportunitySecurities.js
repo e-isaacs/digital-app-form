@@ -87,6 +87,7 @@ router.post("/update-opportunity-securities/:id", async (req, res) => {
 
       // Map fields (with safety + debug warnings)
       const payload = {
+        inh_propertyname: sec.propertyName,
         inh_street1: sec.line1,
         inh_street2: sec.line2,
         inh_street3: sec.line3,
@@ -135,6 +136,7 @@ router.post("/update-opportunity-securities/:id", async (req, res) => {
       // Try find existing match
       const filter = [
         sec.postcode ? `inh_zippostalcode eq '${sec.postcode}'` : null,
+        sec.propertyName ? `inh_propertyname eq '${sec.propertyName}'` : null,
         sec.line1 ? `inh_street1 eq '${sec.line1}'` : null,
         sec.propertyType
           ? `inh_securitytype eq ${propertyTypeReverse[sec.propertyType]}`

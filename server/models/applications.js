@@ -79,6 +79,7 @@ router.post("/crm/create-application", async (req, res) => {
     })),
 
     securities: securities.map((s, index) => ({
+      propertyName: s.propertyName || "",
       line1: s.line1 || "",
       line2: s.line2 || "",
       line3: s.line3 || "",
