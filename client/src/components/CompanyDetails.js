@@ -27,8 +27,6 @@ const [companyNumber, setCompanyNumber] = useState(initialData?.companyNumber ||
 const [shareholders, setShareholders] = useState(initialData?.shareholders || []);
 
 const { guid } = useParams();
-const [saving, setSaving] = useState(false);
-const [saveError, setSaveError] = useState(null);
 
 // Debounced autosave setup
 const debouncedSaveRef = useRef();

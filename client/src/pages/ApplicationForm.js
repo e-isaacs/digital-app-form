@@ -14,10 +14,6 @@ import { findBySraNumber, searchByName } from "../utils/solicitors";
 export default function ApplicationForm() {
   const { guid } = useParams();
 
-  const [formData, setFormData] = useState({});
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
-
   const { state } = useLocation();
   const navigate = useNavigate();
 
@@ -264,6 +260,7 @@ export default function ApplicationForm() {
     let total = 8;
 
     if (security.postcode) completed++;
+    if (security.propertyName) completed++;
     if (security.line1) completed++;
     if (security.town) completed++;
     if (security.propertyType) completed++;

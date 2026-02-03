@@ -25,13 +25,6 @@ const MARITAL_OPTIONS = [
   { value: "Prefer not to say", label: "Prefer not to say" },
 ];
 
-const RESIDENTIAL_STATUS_OPTIONS = [
-  { value: "Owner", label: "Owner" },
-  { value: "Tenant", label: "Tenant" },
-  { value: "With relatives", label: "With relatives" },
-  { value: "Other", label: "Other" },
-];
-
 export default function ApplicantDialog({ onClose, onSave, initialData }) {
   const [tab, setTab] = useState(1);
 
