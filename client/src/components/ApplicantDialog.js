@@ -111,7 +111,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       setMobilePhone(initialData.mobilePhone || "");
       setOtherPhone(initialData.otherPhone || "");
       setEmail(initialData.email || "");
-      setCreditHistory(initialData.creditHistory || { ...creditHistory });
+      setCreditHistory(() => initialData.creditHistory || {});
 
       // Address 1
       setAddress1Line1(initialData.address1Line1 || "");

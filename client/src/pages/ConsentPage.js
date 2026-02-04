@@ -14,6 +14,9 @@ export default function ConsentPage() {
   const { guid } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
+  
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
 
   const [loading, setLoading] = useState(false);
   const [showConfirm, setShowConfirm] = useState(false);
@@ -26,8 +29,6 @@ export default function ConsentPage() {
     ? JSON.parse(localStorage.getItem("companyData") || "null")
     : null;
 
-  const stored = localStorage.getItem("signedApplicants");
-
   const [signedApplicants, setSignedApplicants] = useState(
     (state?.signedApplicants || applicants).map((a) => ({
       ...a,
@@ -37,9 +38,6 @@ export default function ConsentPage() {
       consentPreferences: a.consentPreferences || { email: false, telephone: false, sms: false },
     }))
   );
-
-  const [saving, setSaving] = useState(false);
-  const [saveError, setSaveError] = useState(null);
 
   // 🔄 Debounced autosave for signatures & consent preferences
   const debouncedSaveRef = useRef();
@@ -74,7 +72,7 @@ export default function ConsentPage() {
   // ✅ persist updates to localStorage
   useEffect(() => {
     localStorage.setItem("signedApplicants", JSON.stringify(signedApplicants));
-  }, [signedApplicants]);
+  }, [signedApplicants]); // ✅ now includes dependency
 
   const printRef = useRef();
 

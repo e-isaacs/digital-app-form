@@ -1,4 +1,8 @@
+/** @type {import('tailwindcss').Config} */
 module.exports = {
+  content: [
+    "./src/**/*.{js,jsx,ts,tsx}", // ✅ this line ensures Tailwind scans all your React files
+  ],
   theme: {
     extend: {
       colors: {
@@ -13,5 +17,6 @@ module.exports = {
         "2xl": "1.5rem"
       }
     }
-  }
+  },
+  plugins: [],
 };

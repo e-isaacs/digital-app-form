@@ -17,6 +17,9 @@ export default function ApplicationForm() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState(null);
+
   // Company toggle
   const [isCompany, setIsCompany] = useState(state?.isCompany || false);
   const [companyData, setCompanyData] = useState(
@@ -456,9 +459,6 @@ export default function ApplicationForm() {
 
   const securityHasPurchase = securities.some((s) =>
     s.loanPurpose?.includes("Purchase")
-  );
-  const securityHasAnyPurpose = securities.some(
-    (s) => s.loanPurpose && s.loanPurpose.length > 0
   );
 
   return (
