@@ -28,7 +28,9 @@ const [shareholders, setShareholders] = useState(initialData?.shareholders || []
 
 const { guid } = useParams();
 
+// eslint-disable-next-line no-unused-vars
 const [saving, setSaving] = useState(false);
+// eslint-disable-next-line no-unused-vars
 const [saveError, setSaveError] = useState(null);
 
 // Debounced autosave setup

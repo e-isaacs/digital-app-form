@@ -14,8 +14,10 @@ export default function ConsentPage() {
   const { guid } = useParams();
   const navigate = useNavigate();
   const { state } = useLocation();
-  
+
+  // eslint-disable-next-line no-unused-vars
   const [saving, setSaving] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [saveError, setSaveError] = useState(null);
 
   const [loading, setLoading] = useState(false);
@@ -67,7 +69,7 @@ export default function ConsentPage() {
       const snapshot = buildConsentSnapshot();
       debouncedSaveRef.current(snapshot);
     }
-  }, [buildConsentSnapshot]);
+  }, [buildConsentSnapshot, signedApplicants]); // ✅ add dependency
 
   // ✅ persist updates to localStorage
   useEffect(() => {
@@ -416,17 +418,6 @@ export default function ConsentPage() {
           return [200, 80]; // width & height in pixels
         },
       };
-
-      // Convert ArrayBuffer → base64 (browser-safe)
-      function arrayBufferToBase64(buffer) {
-        let binary = '';
-        const bytes = new Uint8Array(buffer);
-        const len = bytes.byteLength;
-        for (let i = 0; i < len; i++) {
-          binary += String.fromCharCode(bytes[i]);
-        }
-        return window.btoa(binary);
-      }
 
       const imageModule = new ImageModule(imageOpts);
 

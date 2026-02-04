@@ -17,7 +17,9 @@ export default function ApplicationForm() {
   const { state } = useLocation();
   const navigate = useNavigate();
 
+  // eslint-disable-next-line no-unused-vars
   const [saving, setSaving] = useState(false);
+  // eslint-disable-next-line no-unused-vars
   const [saveError, setSaveError] = useState(null);
 
   // Company toggle
