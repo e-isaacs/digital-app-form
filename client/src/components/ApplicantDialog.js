@@ -57,6 +57,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
   // Address 1 state
   // ---------------------------
   const [address1Postcode, setAddress1Postcode] = useState("");
+  const [address1Name, setAddress1Name] = useState("");
   const [address1Line1, setAddress1Line1] = useState("");
   const [address1Line2, setAddress1Line2] = useState("");
   const [address1Line3, setAddress1Line3] = useState("");
@@ -71,6 +72,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
   // Address 2 state
   // ---------------------------
   const [address2Postcode, setAddress2Postcode] = useState("");
+  const [address2Name, setAddress2Name] = useState("");
   const [address2Line1, setAddress2Line1] = useState("");
   const [address2Line2, setAddress2Line2] = useState("");
   const [address2Line3, setAddress2Line3] = useState("");
@@ -85,6 +87,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
   // Address 3 state
   // ---------------------------
   const [address3Postcode, setAddress3Postcode] = useState("");
+  const [address3Name, setAddress3Name] = useState("");
   const [address3Line1, setAddress3Line1] = useState("");
   const [address3Line2, setAddress3Line2] = useState("");
   const [address3Line3, setAddress3Line3] = useState("");
@@ -114,6 +117,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       setCreditHistory(() => initialData.creditHistory || {});
 
       // Address 1
+      setAddress1Name(initialData.address1Name || "");
       setAddress1Line1(initialData.address1Line1 || "");
       setAddress1Line2(initialData.address1Line2 || "");
       setAddress1Line3(initialData.address1Line3 || "");
@@ -125,6 +129,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       setAddress1ResidentialStatus(initialData.address1ResidentialStatus || "");
 
       // Address 2
+      setAddress2Name(initialData.address2Name || "");
       setAddress2Line1(initialData.address2Line1 || "");
       setAddress2Line2(initialData.address2Line2 || "");
       setAddress2Line3(initialData.address2Line3 || "");
@@ -136,6 +141,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       setAddress2ResidentialStatus(initialData.address2ResidentialStatus || "");
 
       // Address 3
+      setAddress3Name(initialData.address3Name || "");
       setAddress3Line1(initialData.address3Line1 || "");
       setAddress3Line2(initialData.address3Line2 || "");
       setAddress3Line3(initialData.address3Line3 || "");
@@ -176,6 +182,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       email,
 
       // Flattened address fields
+      address1Name,
       address1Line1,
       address1Line2,
       address1Line3,
@@ -186,6 +193,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       address1AtSince,
       address1ResidentialStatus,
 
+      address2Name,
       address2Line1,
       address2Line2,
       address2Line3,
@@ -196,6 +204,7 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
       address2AtSince,
       address2ResidentialStatus,
 
+      address3Name,
       address3Line1,
       address3Line2,
       address3Line3,
@@ -434,7 +443,8 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
                     );
                     const address = detailRes.data;
 
-                    setAddress1Line1(address.line_1 || "");
+                    setAddress1Name(address.building_number || "");
+                    setAddress1Line1(address.thoroughfare || "");
                     setAddress1Line2(address.line_2 || "");
                     setAddress1Line3(address.line_3 || "");
                     setAddress1Town(address.town_or_city || "");
@@ -453,6 +463,13 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
               </div>
             )}
 
+            <div className="form-group">
+              <label>Property Name/Number</label>
+              <input
+                value={address1Name}
+                onChange={(e) => setAddress1Name(e.target.value)}
+              />
+            </div>
             <div className="form-group">
               <label>Street 1</label>
               <input
@@ -553,7 +570,8 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
                           );
                           const address = detailRes.data;
 
-                          setAddress2Line1(address.line_1 || "");
+                          setAddress2Name(address.building_number || "");
+                          setAddress2Line1(address.thoroughfare || "");
                           setAddress2Line2(address.line_2 || "");
                           setAddress2Line3(address.line_3 || "");
                           setAddress2Town(address.town_or_city || "");
@@ -572,6 +590,13 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
                     </div>
                   )}
 
+                  <div className="form-group">
+                    <label>Property Name/Number</label>
+                    <input
+                      value={address2Name}
+                      onChange={(e) => setAddress2Name(e.target.value)}
+                    />
+                  </div>
                   <div className="form-group">
                     <label>Street 1</label>
                     <input
@@ -673,7 +698,8 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
                             );
                             const address = detailRes.data;
 
-                            setAddress3Line1(address.line_1 || "");
+                            setAddress3Name(address.building_number || "");
+                            setAddress3Line1(address.thoroughfare || "");
                             setAddress3Line2(address.line_2 || "");
                             setAddress3Line3(address.line_3 || "");
                             setAddress3Town(address.town_or_city || "");
@@ -692,6 +718,13 @@ export default function ApplicantDialog({ onClose, onSave, initialData }) {
                       </div>
                     )}
 
+                  <div className="form-group">
+                    <label>Property Name/Number</label>
+                    <input
+                      value={address3Name}
+                      onChange={(e) => setAddress3Name(e.target.value)}
+                    />
+                  </div>
                     <div className="form-group">
                       <label>Street 1</label>
                       <input

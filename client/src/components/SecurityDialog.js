@@ -30,6 +30,7 @@ const PROPERTY_TYPE_OPTIONS = [
 export default function SecurityDialog({ onClose, onSave, initialData }) {
   const [postcode, setPostcode] = useState("");
   const [addresses, setAddresses] = useState([]);
+  const [propertyName, setPropertyName] = useState("");
   const [line1, setLine1] = useState("");
   const [line2, setLine2] = useState("");
   const [line3, setLine3] = useState("");
@@ -50,6 +51,7 @@ export default function SecurityDialog({ onClose, onSave, initialData }) {
   useEffect(() => {
     if (initialData) {
       setPostcode(initialData.postcode || "");
+      setPropertyName(initialData.propertyName || "");
       setLine1(initialData.line1 || "");
       setLine2(initialData.line2 || "");
       setLine3(initialData.line2 || "");
@@ -91,6 +93,7 @@ export default function SecurityDialog({ onClose, onSave, initialData }) {
   const handleSave = () => {
     onSave({
       postcode,
+      propertyName,
       line1,
       line2,
       line3,
@@ -143,7 +146,8 @@ export default function SecurityDialog({ onClose, onSave, initialData }) {
               );
               const address = detailRes.data;
 
-              setLine1(address.line_1 || "");
+              setPropertyName(address.building_number || "");
+              setLine1(address.thoroughfare || "");
               setLine2(address.line_2 || "");
               setLine3(address.line_3 || "");
               setTown(address.town_or_city || "");
@@ -163,6 +167,10 @@ export default function SecurityDialog({ onClose, onSave, initialData }) {
       )}
 
       {/* Address fields */}
+      <div className="form-group">
+        <label>Property Name/Number</label>
+        <input value={propertyName} onChange={(e) => setPropertyName(e.target.value)} />
+      </div>
       <div className="form-group">
         <label>Address Line 1</label>
         <input value={line1} onChange={(e) => setLine1(e.target.value)} />
